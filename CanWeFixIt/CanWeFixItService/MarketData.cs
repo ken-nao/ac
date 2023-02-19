@@ -6,7 +6,6 @@ namespace CanWeFixItService
         public long? DataValue { get; set; }
         public string Sedol { get; set; }
         public bool Active { get; set; }
-
         public int? InstrumentId { get; set; }
     }
 
