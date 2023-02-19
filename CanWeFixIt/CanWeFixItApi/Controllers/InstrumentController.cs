@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using CanWeFixItService;
 
 namespace CanWeFixItApi.Controllers
 {
@@ -14,10 +15,11 @@ namespace CanWeFixItApi.Controllers
         {
             _database = database;
         }
-        
+
         // GET
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Instrument>>> Get()
-        {   
+        {
             return Ok(_database.Instruments().Result);
         }
     }

@@ -9,10 +9,10 @@ namespace CanWeFixItService
     {
         // See SQLite In-Memory example:
         // https://github.com/dotnet/docs/blob/main/samples/snippets/standard/data/sqlite/InMemorySample/Program.cs
-        
+
         // Using a name and a shared cache allows multiple connections to access the same
         // in-memory database
-        const string connectionString = "Data Source=DatabaseService;Mode=Memory;Cache=Shared";
+        const string connectionString = "Data Source=DatabaseService1;Mode=Memory;Cache=Shared";
         private SqliteConnection _connection;
 
         public DatabaseService()
@@ -22,15 +22,23 @@ namespace CanWeFixItService
             _connection = new SqliteConnection(connectionString);
             _connection.Open();
         }
-        
-        public IEnumerable<Instrument> Instruments()
+
+        public async Task<IEnumerable<Instrument>> Instruments()
         {
-            return _connection.QueryAsync<Instrument>("SQL GOES HERE");
+            return await _connection.QueryAsync<Instrument>("SELECT id, sedol, name, active FROM instrument where Active = 1");
         }
 
         public async Task<IEnumerable<MarketData>> MarketData()
         {
-            return await _connection.QueryAsync<MarketData>("SELECT Id, DataValue FROM MarketData WHERE Active = 0");
+            return await _connection.QueryAsync<MarketData>(@"SELECT m.Id, m.DataValue, m.sedol, m.active, i.Id as instrumentId 
+                FROM MarketData m 
+                inner join instrument i 
+                ON m.sedol = i.sedol WHERE m.Active = 1");
+        }
+
+        public async Task<IEnumerable<MarketValuation>> MarketValuation()
+        {
+            return await _connection.QueryAsync<MarketValuation>("SELECT 'DataValueTotal' as Name, sum(datavalue) as Total from MarketData where Active = 1");
         }
 
         /// <summary>
